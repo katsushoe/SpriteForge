@@ -13,6 +13,7 @@ Update dependencies explicitly, regenerate the lock, and run lint, lifecycle and
 | `pystray`, `pillow` | Windows notification-area UI and code-generated icon |
 | `packaging` | Version parsing and stable/prerelease comparison |
 | `psutil` | Process executable, owner and command-line verification |
+| `tomlkit` | Preserve Codex TOML comments and unrelated settings during registration |
 | `hatchling` | Wheel/sdist build backend |
 | `pytest`, `ruff` | Test runner, lint and formatting |
 

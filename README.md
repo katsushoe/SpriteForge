@@ -3,8 +3,8 @@
 English | [日本語](README.ja.md)
 
 A user-managed Windows 10/11 MCP daemon for pixel-art and sprite-animation workflows.
-This initial implementation provides lifecycle commands, authenticated HTTP, explicit diagnostic
-STDIO, a notification-area application and official GitHub release metadata checks.
+This development implementation provides lifecycle commands, authenticated HTTP, explicit diagnostic
+STDIO, a notification-area application, client registration and official release metadata checks.
 Projects, image generation, persistent jobs and exports are not implemented yet.
 
 ## Development
@@ -54,5 +54,8 @@ the daemon running; `Exit and Stop Daemon` explicitly stops it. All update actio
 - [Security](SECURITY.md)
 
 No Windows Service or elevated operation is introduced. Claude Code and Codex connect to an
-already-running HTTP daemon. Actual client configuration has not been modified or verified.
+already-running HTTP daemon. `configure`/`unconfigure` preserve other client settings and register
+HTTP-only entries containing an environment-variable reference. `auth-shell` supplies credentials
+to a manually opened PowerShell without storing plaintext tokens. See the MCP connection document.
+Actual user client configuration has not been modified or interactively verified.
 Do not register a command that launches the daemon from either client.

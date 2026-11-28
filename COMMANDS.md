@@ -23,6 +23,9 @@ Prefix every command with `uv run` when using the source checkout.
 | `spriteforge update download` | Fail explicitly: verified staging is not implemented |
 | `spriteforge update apply` | Fail explicitly: safe installation/rollback is not implemented |
 | `spriteforge --version` | Show the initial development version `0.0.0.0` |
+| `spriteforge configure codex\|claude [--dry-run] [--config-path <file>]` | Add an HTTP-only entry, preserving unrelated settings |
+| `spriteforge unconfigure codex\|claude [--dry-run] [--config-path <file>]` | Remove only an unchanged entry owned by this installation |
+| `spriteforge auth-shell` | Open an explicitly requested PowerShell with the DPAPI token in that process environment |
 
 Normal command results are JSON on stdout; errors are safe JSON on stderr with exit code 1.
 Ctrl+C returns 130. Argument errors return 2. STDIO stdout is reserved for MCP messages.
@@ -34,4 +37,11 @@ Repeated start adds `already_running: true` and preserves PID. Missing daemon yi
 An occupied, unrecognized or unauthenticated endpoint yields `error`; no unrelated process is killed.
 
 All tray update commands are under `Updates`; source archives and releases without compatible
-packages cannot be downloaded/installed. Client configure/unconfigure commands are not implemented.
+packages cannot be downloaded/installed.
+
+Client registration requires that client's executable on PATH; removal also works after the client
+has been uninstalled. Dry runs write nothing. Conflicting, malformed or modified entries fail without
+overwriting them. Config writes are atomic; a metadata-write failure restores the previous config.
+The auth shell requires an existing token, never starts the daemon, and does not persist a user-level
+environment variable. Exit the shell to discard its environment. Actual client registration is an
+explicit user operation, separate from implementing these commands.

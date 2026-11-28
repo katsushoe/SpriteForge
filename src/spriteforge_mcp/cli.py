@@ -30,6 +30,12 @@ def parser() -> argparse.ArgumentParser:
     logs.add_argument("--follow", action="store_true")
     update = commands.add_parser("update")
     update.add_argument("action", choices=["check", "status", "configure", "download", "apply"])
+    for operation in ("configure", "unconfigure"):
+        client = commands.add_parser(operation)
+        client.add_argument("client", choices=["codex", "claude"])
+        client.add_argument("--config-path", type=Path, help="Explicit client configuration file")
+        client.add_argument("--dry-run", action="store_true", help="Preview without writing files")
+    commands.add_parser("auth-shell", help="Open a shell with the DPAPI token in its environment")
     return result
 
 
@@ -99,6 +105,23 @@ def execute(args, paths: Paths) -> int:
         from spriteforge_mcp.tray import run_tray
 
         run_tray(paths, settings)
+    elif command in {"configure", "unconfigure"}:
+        from spriteforge_mcp.clients import configure
+
+        emit(
+            configure(
+                paths,
+                settings,
+                args.client,
+                config_path=args.config_path,
+                remove=command == "unconfigure",
+                dry_run=args.dry_run,
+            )
+        )
+    elif command == "auth-shell":
+        from spriteforge_mcp.clients import authenticated_shell
+
+        return authenticated_shell(paths)
     elif command == "update":
         from spriteforge_mcp.updater import check_updates
 
@@ -131,7 +154,7 @@ def main(argv: list[str] | None = None) -> int:
         from spriteforge_mcp.security import local_token
 
         try:
-            if paths:
+            if paths and not getattr(args, "dry_run", False):
                 token = local_token(paths) if paths.secret.exists() else ""
                 configure_logging(paths, token)
             logging.getLogger(__name__).exception("CLI command failed")

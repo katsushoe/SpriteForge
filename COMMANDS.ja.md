@@ -23,6 +23,9 @@ WindowsのPowerShellで、リポジトリ内から `uv sync --locked` を実行�
 | `spriteforge update download` | 検証済みの保存処理が未実装として失敗 |
 | `spriteforge update apply` | 安全なインストール・復旧が未実装として失敗 |
 | `spriteforge --version` | 初期開発版 `0.0.0.0` を表示 |
+| `spriteforge configure codex\|claude [--dry-run] [--config-path <ファイル>]` | 他の設定を保持してHTTP接続項目を登録 |
+| `spriteforge unconfigure codex\|claude [--dry-run] [--config-path <ファイル>]` | この環境で登録した、変更されていない項目だけを解除 |
+| `spriteforge auth-shell` | DPAPIトークンをそのプロセスの環境変数にだけ渡したPowerShellを明示起動 |
 
 通常の結果は標準出力へJSONで返します。エラーは安全なJSONで標準エラー出力へ返し、終了コード1にします。
 Ctrl+Cは130、引数の誤りは2です。STDIOの標準出力はMCP通信専用です。
@@ -34,4 +37,11 @@ Ctrl+Cは130、引数の誤りは2です。STDIOの標準出力はMCP通信専�
 Daemon不在は `stopped`、ポートの占有や認証・識別の失敗は `error` です。無関係なプロセスは終了しません。
 
 トレイの更新操作は `Updates` にまとめています。ソースアーカイブと対応パッケージのないリリースは
-ダウンロード・インストールできません。クライアントのconfigure／unconfigureコマンドは未実装です。
+ダウンロード・インストールできません。
+
+登録にはクライアントの実行ファイルがPATH上に必要です。解除はクライアント削除後も実行できます。
+`--dry-run` は書き込みません。競合、不正形式、登録後に変更された設定は上書きせず失敗します。
+設定は原子的に保存し、管理情報の保存に失敗したら元の設定へ戻します。
+認証用PowerShellには既存トークンが必要で、Daemonは起動しません。
+ユーザー環境変数として永続化せず、PowerShell終了時にその環境を破棄します。
+実際のクライアント設定変更は、これらのコマンドの実装とは別の明示的な操作です。

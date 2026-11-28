@@ -19,5 +19,11 @@ SHA-256 manifest is required even to identify a future package as ready for veri
 No package download, extraction, executable replacement or update helper is implemented yet.
 Metadata-only releases do not modify installation files or stop the daemon.
 
-This is a development build. Client credential provisioning, image import limits, persistent job
+Client registration stores only an environment-variable reference. An explicitly invoked auth-shell
+passes the DPAPI-decrypted token in its child environment without changing registry/user environment
+settings, arguments or output. Other processes running as the same Windows user remain trusted.
+Ownership metadata prevents unconfigure from deleting modified or unowned settings. Actual client
+configuration changes require an explicit user operation; tests use temporary files.
+
+This is a development build. Desktop client credential provisioning, image import limits, persistent job
 recovery, signed update verification, rollback and MSI packaging remain later work.

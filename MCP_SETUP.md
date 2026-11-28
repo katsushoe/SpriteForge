@@ -15,9 +15,27 @@ The initial shared HTTP/STDIO registry contains the read-only `get_version` tool
 ## Client readiness
 
 No actual Claude Code or Codex settings have been changed by this implementation.
-Automatic `configure`/`unconfigure`, protected client credential provisioning, and real-client
-connection verification are pending. An endpoint-only configuration without a bearer token will
-fail with HTTP 401. Do not copy the encrypted token file into client settings or publish a token.
+`configure`/`unconfigure` now support user-scoped HTTP registrations, preserving unrelated settings.
+The Codex default is `$CODEX_HOME/config.toml` or `~/.codex/config.toml`; Claude defaults to
+`~/.claude.json` (or `.claude.json` in `CLAUDE_CONFIG_DIR`). `--config-path` explicitly overrides it.
+Real-client connection verification remains pending. An endpoint-only configuration without a
+bearer token fails with HTTP 401. Do not copy the encrypted token file into settings or publish a token.
+
+Registrations reference `SPRITEFORGE_MCP_TOKEN`: Codex uses `bearer_token_env_var`; Claude uses
+`Bearer ${SPRITEFORGE_MCP_TOKEN}` in its HTTP header. The actual token is never written to these files.
+TOML comments and other client entries are retained; changed or unowned conflicting entries are refused.
+Ownership metadata lives in `<data-root>/config/client-registrations.json`. Use the same data root for
+registration and removal; removal refuses to delete entries without matching ownership metadata.
+
+For a development CLI session, `spriteforge auth-shell` opens a foreground PowerShell inheriting the
+token decrypted from DPAPI. Launch either client manually in that shell. It only provides credentials:
+the daemon must already be running and is never started by a client. The token is not stored in the
+Windows user environment or included in process arguments. Close the shell to end this credential
+session. An already-running desktop client does not inherit a newly opened shell's environment;
+desktop provisioning and interactive client validation remain unverified.
+
+Format references: [Codex MCP configuration](https://learn.chatgpt.com/docs/extend/mcp) and
+[Claude Code MCP configuration](https://code.claude.com/docs/en/mcp).
 
 SDK integration tests exercise initialize, tool discovery, structured version output and invalid-tool
 errors using two concurrent clients. This is not a claim of validation inside either AI application.
