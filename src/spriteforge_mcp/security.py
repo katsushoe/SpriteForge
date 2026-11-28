@@ -13,6 +13,22 @@ class AlreadyRunning(RuntimeError):
     pass
 
 
+TEST_NAMESPACE_ENV = "SPRITEFORGE_TEST_MUTEX_NAMESPACE"
+
+
+def mutex_name(name: str) -> str:
+    """Return the session-wide mutex name.
+
+    The guard is intentionally shared across data-root overrides. The test suite alone
+    sets TEST_NAMESPACE_ENV so its daemons do not collide with a user's running daemon.
+    """
+    namespace = os.environ.get(TEST_NAMESPACE_ENV, "")
+    if namespace and not namespace.isalnum():
+        raise ValueError(f"{TEST_NAMESPACE_ENV} must be alphanumeric")
+    prefix = f"Test{namespace}_" if namespace else ""
+    return f"Local\\SpriteForgeMCP_{prefix}{name}"
+
+
 @contextmanager
 def singleton(name: str):
     if os.name != "nt":
@@ -21,7 +37,7 @@ def singleton(name: str):
     kernel.CreateMutexW.argtypes = [ctypes.c_void_p, wintypes.BOOL, wintypes.LPCWSTR]
     kernel.CreateMutexW.restype = wintypes.HANDLE
     kernel.CloseHandle.argtypes = [wintypes.HANDLE]
-    handle = kernel.CreateMutexW(None, False, f"Local\\SpriteForgeMCP_{name}")
+    handle = kernel.CreateMutexW(None, False, mutex_name(name))
     error = ctypes.get_last_error()
     if not handle:
         raise ctypes.WinError(error)

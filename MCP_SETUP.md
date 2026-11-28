@@ -14,12 +14,13 @@ The initial shared HTTP/STDIO registry contains the read-only `get_version` tool
 
 ## Client readiness
 
-No actual Claude Code or Codex settings have been changed by this implementation.
-`configure`/`unconfigure` now support user-scoped HTTP registrations, preserving unrelated settings.
+As of 2026-11-28, the user-scoped entries in `~/.claude.json` and `~/.codex/config.toml` are registered
+with matching ownership metadata. `configure`/`unconfigure` support user-scoped HTTP registrations, preserving unrelated settings.
 The Codex default is `$CODEX_HOME/config.toml` or `~/.codex/config.toml`; Claude defaults to
 `~/.claude.json` (or `.claude.json` in `CLAUDE_CONFIG_DIR`). `--config-path` explicitly overrides it.
-Real-client connection verification remains pending. An endpoint-only configuration without a
-bearer token fails with HTTP 401. Do not copy the encrypted token file into settings or publish a token.
+With the token in the child environment, `claude mcp get spriteforge-mcp` reports `Connected`;
+without it, the daemon rejects the request with HTTP 401. `codex mcp get` shows the registered
+Streamable HTTP entry. A tool call from an interactive client session remains unverified. Do not copy the encrypted token file into settings or publish a token.
 
 Registrations reference `SPRITEFORGE_MCP_TOKEN`: Codex uses `bearer_token_env_var`; Claude uses
 `Bearer ${SPRITEFORGE_MCP_TOKEN}` in its HTTP header. The actual token is never written to these files.

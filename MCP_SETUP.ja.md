@@ -15,12 +15,14 @@ MCPには起動・停止のツールを公開しません。HTTP／STDIOで共�
 
 ## クライアント対応状況
 
-今回の実装で実際のClaude Code・Codex設定は変更していません。
+2026-11-28時点で、`~/.claude.json` と `~/.codex/config.toml` にユーザー単位の項目を所有情報付きで登録済みです。
 configure／unconfigureは、他の項目を保持するユーザー単位のHTTP登録・解除に対応しました。
 Codexの既定は `$CODEX_HOME/config.toml` または `~/.codex/config.toml`、Claudeは
 `~/.claude.json`（`CLAUDE_CONFIG_DIR` 指定時はその中の `.claude.json`）です。
-`--config-path` で明示的に変更できます。実クライアントの接続確認は未完了です。
-URLだけを登録して認証トークンを渡さない場合はHTTP 401になります。
+`--config-path` で明示的に変更できます。
+子プロセスの環境にトークンを渡すと `claude mcp get spriteforge-mcp` は `Connected` になり、
+渡さない場合はDaemonがHTTP 401で拒否します。`codex mcp get` ではStreamable HTTPの登録内容を確認できます。
+対話セッションのクライアントからのツール呼び出しは未確認です。
 暗号化したトークンファイルをクライアント設定へコピーしたり、トークンを公開したりしないでください。
 
 登録項目は `SPRITEFORGE_MCP_TOKEN` を参照します。Codexは `bearer_token_env_var`、Claudeは

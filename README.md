@@ -57,5 +57,5 @@ No Windows Service or elevated operation is introduced. Claude Code and Codex co
 already-running HTTP daemon. `configure`/`unconfigure` preserve other client settings and register
 HTTP-only entries containing an environment-variable reference. `auth-shell` supplies credentials
 to a manually opened PowerShell without storing plaintext tokens. See the MCP connection document.
-Actual user client configuration has not been modified or interactively verified.
+User client entries are registered; a tool call from an interactive client session is not yet verified.
 Do not register a command that launches the daemon from either client.

@@ -42,3 +42,5 @@ The PID metadata is diagnostic and never authorizes termination by itself.
 
 The session mutex prevents multiple daemons across data-root overrides within the same session.
 Stop the existing daemon with its original data root before using another root.
+`SPRITEFORGE_TEST_MUTEX_NAMESPACE` is reserved for the test suite, which uses it to isolate
+its daemons from a running user daemon. Do not set it for normal use.

@@ -16,7 +16,14 @@ from pydantic import ValidationError
 from spriteforge_mcp.config import Paths, Settings
 from spriteforge_mcp.logging_config import RedactedFormatter
 from spriteforge_mcp.runtime import Manager
-from spriteforge_mcp.security import AlreadyRunning, local_token, protect, singleton
+from spriteforge_mcp.security import (
+    TEST_NAMESPACE_ENV,
+    AlreadyRunning,
+    local_token,
+    mutex_name,
+    protect,
+    singleton,
+)
 from spriteforge_mcp.server import build_http_app, build_mcp_server
 from spriteforge_mcp.tray import TrayController
 from spriteforge_mcp.updater import classify_release
@@ -54,6 +61,21 @@ def test_mutex_prevents_duplicate_daemon_and_releases():
             pytest.fail("Duplicate guard was acquired")
     with singleton("TestSingleton"):
         pass
+
+
+def test_mutex_name_is_shared_in_production_and_isolated_in_tests(monkeypatch):
+    monkeypatch.delenv(TEST_NAMESPACE_ENV)
+    assert mutex_name("Daemon") == "Local\\SpriteForgeMCP_Daemon"
+    with singleton("TestScoped"):
+        with pytest.raises(AlreadyRunning), singleton("TestScoped"):
+            pytest.fail("Duplicate guard was acquired in the same namespace")
+        monkeypatch.setenv(TEST_NAMESPACE_ENV, "Other")
+        assert mutex_name("Daemon") == "Local\\SpriteForgeMCP_TestOther_Daemon"
+        with singleton("TestScoped"):
+            pass
+    monkeypatch.setenv(TEST_NAMESPACE_ENV, "bad-name")
+    with pytest.raises(ValueError):
+        mutex_name("Daemon")
 
 
 def test_logs_redact_token_and_bearer_including_exceptions():
